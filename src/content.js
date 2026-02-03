@@ -121,6 +121,7 @@ function injectWidget() {
             padding: 16px;
             max-height: 400px;
             overflow-y: auto;
+            background: #00000010;
         }
 
         .arp-section {
@@ -178,7 +179,7 @@ function injectWidget() {
             display: flex;
             align-items: center;
             gap: 12px;
-            background: #f5f5f7;
+            background: #ffffff;
             padding: 10px;
             border-radius: 8px;
         }
@@ -198,8 +199,8 @@ function injectWidget() {
         .arp-button {
             width: 100%;
             padding: 10px;
-            background: #111;
-            color: #fff;
+            background: #ffce12;
+            color: #111;
             border: none;
             font-weight: 600;
             font-size: 13px;
@@ -208,7 +209,7 @@ function injectWidget() {
         }
         
         .arp-button:hover {
-            background: #000;
+            background: #e6b800;
         }
     `;
 
@@ -323,11 +324,21 @@ function getTemplate(data) {
                 </ul>
             </div>
 
-            <div class="arp-section">
-                <div class="arp-label">Estimated Longevity</div>
-                <div class="arp-longevity">
-                    <div class="arp-score">${data.longevityScore}</div>
-                    <div class="arp-score-label">Average Lifespan<br>based on users</div>
+            <div class="arp-section" style="display: flex; gap: 12px;">
+                <div style="flex: 1;">
+                    <div class="arp-label">Longevity Est.</div>
+                    <div class="arp-longevity">
+                        <div class="arp-score">${data.longevityScore}</div>
+                    </div>
+                </div>
+                <div style="flex: 1;">
+                    <div class="arp-label">Trust Score</div>
+                    <div class="arp-longevity">
+                         ${data.trustScore ? `
+                            <div class="arp-score" style="color: ${data.trustScore.color}; font-size: 18px;">${data.trustScore.label}</div>
+                            <div class="arp-score-label">${data.trustScore.percent}% Verified<br>Purchases</div>
+                         ` : '<div class="arp-score-label">Calculating...</div>'}
+                    </div>
                 </div>
             </div>
         </div>

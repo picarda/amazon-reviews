@@ -114,11 +114,32 @@ function analyzePage(document) {
     if (percentFail > 10) longevity = "6-12 Months";
     if (percentFail > 30) longevity = "< 3 Months";
 
+    // Authenticity / Trust Score Heuristic
+    // Based on percentage of Verified Purchases in the sample
+    const verifiedCount = reviews.filter(r => r.verified).length;
+    const verifiedRatio = totalReviews > 0 ? (verifiedCount / totalReviews) : 0;
+
+    let trustScore = "High";
+    let trustColor = "green";
+
+    if (verifiedRatio < 0.5) {
+        trustScore = "Low";
+        trustColor = "red";
+    } else if (verifiedRatio < 0.8) {
+        trustScore = "Medium";
+        trustColor = "orange";
+    }
+
     return {
         reviewCount: totalReviews,
         summary: summary,
         dealbreakers: dealbreakers,
-        longevityScore: longevity
+        longevityScore: longevity,
+        trustScore: {
+            label: trustScore,
+            color: trustColor,
+            percent: Math.round(verifiedRatio * 100)
+        }
     };
 }
 
