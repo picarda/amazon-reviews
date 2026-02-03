@@ -1,0 +1,36 @@
+{
+    "manifest_version": 3,
+    "name": "Amazon Review Pulse",
+    "version": "1.0",
+    "description": "AI-powered brutally honest review analyzer.",
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "storage"
+    ],
+    "host_permissions": [
+        "*://*.amazon.com/*",
+        "*://*.amazon.ca/*",
+        "*://*.amazon.co.uk/*",
+        "*://*.amazon.de/*"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "*://*.amazon.com/*",
+                "*://*.amazon.ca/*",
+                "*://*.amazon.co.uk/*",
+                "*://*.amazon.de/*"
+            ],
+            "js": [
+                "src/analyzer.js",
+                "src/content.js"
+            ]
+        }
+    ],
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    }
+}
