@@ -197,31 +197,84 @@ function injectWidget() {
     const container = document.createElement('div');
     container.className = 'arp-widget';
 
-    // Run initial analysis (Mock for now)
-    const analysis = analyzePage(document);
+    // Run initial analysis
+    // Retry a few times if reviews aren't loaded yet (dynamic loading)
+    let attempts = 0;
+    const maxAttempts = 10;
 
-    container.innerHTML = `
+    const runAnalysis = () => {
+        const analysis = analyzePage(document);
+
+        if (!analysis && attempts < maxAttempts) {
+            attempts++;
+            console.log(`Amazon Review Pulse: Waiting for reviews... (Attempt ${attempts})`);
+
+            // Show loading state
+            updateUIState(container, {
+                reviewCount: 0,
+                summary: "Analyzing reviews...",
+                dealbreakers: ["Scanning page content..."],
+                longevityScore: "..."
+            });
+
+            setTimeout(runAnalysis, 1500); // Retry every 1.5s
+            return;
+        }
+
+        if (analysis) {
+            updateUIState(container, analysis);
+        } else {
+            updateUIState(container, {
+                reviewCount: 0,
+                summary: "Could not find reviews on this page.",
+                dealbreakers: ["Try scrolling down to load reviews", "Or check 'See All Reviews' page"],
+                longevityScore: "?"
+            });
+        }
+    };
+
+    // Initial render with loading state
+    container.innerHTML = getTemplate({
+        reviewCount: 0,
+        summary: "Initializing...",
+        dealbreakers: [],
+        longevityScore: "-"
+    });
+
+    shadow.appendChild(style);
+    shadow.appendChild(container);
+
+    // Kicks off the loop
+    runAnalysis();
+}
+
+function updateUIState(container, data) {
+    container.innerHTML = getTemplate(data);
+}
+
+function getTemplate(data) {
+    return `
         <div class="arp-header">
             <div class="arp-title">
                 <div class="arp-pulse-dot"></div>
                 Review Pulse
             </div>
-            <div style="font-size: 10px; color: #999;">${analysis.reviewCount} reviews analyzed</div>
+            <div style="font-size: 10px; color: #999;">${data.reviewCount} reviews analyzed</div>
         </div>
         <div class="arp-content">
             <div class="arp-section">
                 <div class="arp-label">The "But" Summary</div>
                 <div class="arp-summary-text">
-                    ${analysis.summary}
+                    ${data.summary}
                 </div>
             </div>
             
             <div class="arp-section">
                 <div class="arp-label">Top Dealbreakers</div>
                 <ul class="arp-dealbreakers">
-                    ${analysis.dealbreakers.map(d => `
+                    ${data.dealbreakers.map(d => `
                         <li class="arp-dealbreaker-item">
-                            <span class="arp-icon-warn">${ICONS.alert}</span>
+                            ${d.includes('Scanning') || d.includes('loading') ? '' : '<span class="arp-icon-warn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>'}
                             ${d}
                         </li>
                     `).join('')}
@@ -231,17 +284,30 @@ function injectWidget() {
             <div class="arp-section">
                 <div class="arp-label">Estimated Longevity</div>
                 <div class="arp-longevity">
-                    <div class="arp-score">${analysis.longevityScore}</div>
+                    <div class="arp-score">${data.longevityScore}</div>
                     <div class="arp-score-label">Average Lifespan<br>based on users</div>
                 </div>
             </div>
         </div>
         <button class="arp-button">Full Report</button>
     `;
-
-    shadow.appendChild(style);
-    shadow.appendChild(container);
 }
 
 // Start
+let lastUrl = location.href;
 init();
+
+// Watch for SPA URL changes
+setInterval(() => {
+    if (location.href !== lastUrl) {
+        lastUrl = location.href;
+        console.log('Amazon Review Pulse: URL changed, re-initializing...');
+
+        // Remove old widget to ensure fresh state
+        const oldContainer = document.getElementById('arp-container');
+        if (oldContainer) oldContainer.remove();
+
+        // Re-run init
+        init();
+    }
+}, 1000);
