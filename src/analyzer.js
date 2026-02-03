@@ -39,7 +39,12 @@ function analyzePage(document) {
         const date = el.querySelector('span[data-hook="review-date"]')?.innerText || '';
 
         // Verified
-        const verified = !!el.querySelector('span[data-hook="avp-badge"]');
+        let verified = !!el.querySelector('span[data-hook="avp-badge"]');
+        if (!verified) {
+            // Fallback: Check identifying text (Safe language check)
+            const reviewText = el.innerText || '';
+            verified = reviewText.includes('Verified Purchase') || reviewText.includes('Verifizierter Kauf');
+        }
 
         return { body: body || '', title: title || '', date, verified };
     });

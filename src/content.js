@@ -132,7 +132,7 @@ function injectWidget() {
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: #888;
+            color: #000;
             margin-bottom: 6px;
             font-weight: 600;
         }
