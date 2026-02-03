@@ -295,7 +295,10 @@ function getTemplate(data) {
         <div class="arp-header">
             <div class="arp-title">
                 <div class="arp-pulse-dot"></div>
-                Review Pulse
+                <div>
+                    <div>Review Pulse</div>
+                    <a href="https://alainpicard.ca" target="_blank" style="font-size: 10px; color: #999; text-decoration: none; font-weight: 400; display: block; line-height: 1; margin-top: 2px;">by alainpicard.ca</a>
+                </div>
             </div>
             <div style="display: flex; align-items: center; gap: 8px;">
                 <div style="font-size: 10px; color: #999;">${data.reviewCount} reviews</div>
@@ -342,7 +345,7 @@ function getTemplate(data) {
                 </div>
             </div>
         </div>
-        <button class="arp-button">Full Report</button>
+        <div class="arp-button" style="text-align: center; cursor: default;">The Report</div>
     `;
 }
 
